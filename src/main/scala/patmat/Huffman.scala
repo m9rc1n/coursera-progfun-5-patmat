@@ -38,7 +38,6 @@ object Huffman {
   def makeCodeTree(left: CodeTree, right: CodeTree) =
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
 
-
   // Part 2: Generating Huffman trees
 
   /**
@@ -72,10 +71,28 @@ object Huffman {
     * pair match {
     * case (theChar, theInt) =>
     * println("character is: "+ theChar)
-    * println("integer is  : "+ theInt)
+    * println("integer is: "+ theInt)
     * }
     */
-  def times(chars: List[Char]): List[(Char, Int)] = ???
+  def times(chars: List[Char]): List[(Char, Int)] = {
+
+    def getCorrectPair(result: List[(Char, Int)], head: Char):(Char, Int) = {
+      if (result.head._1 == head) result.head
+      else getCorrectPair(result.tail, head)
+    }
+
+    def timesAcc(chars: List[Char], result: List[(Char, Int)]): List[(Char, Int)] = {
+      if (chars.isEmpty) result
+      else {
+        getCorrectPair(result, chars.head) match {
+          case (char, counter) => timesAcc(chars.tail, (chars.head, counter+1) :: result.filterNot(p => p._1 == chars.head))
+          case _ => timesAcc(chars.tail, (chars.head, 1) :: result)
+        }
+      }
+    }
+
+    timesAcc(chars, List.empty)
+  }
 
   /**
     * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
