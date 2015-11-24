@@ -76,7 +76,7 @@ object Huffman {
     */
   def times(chars: List[Char]): List[(Char, Int)] = {
 
-    def getCorrectPair(result: List[(Char, Int)], head: Char):(Char, Int) = {
+    def getCorrectPair(result: List[(Char, Int)], head: Char): (Char, Int) = {
       if (result.head._1 == head) result.head
       else getCorrectPair(result.tail, head)
     }
@@ -85,7 +85,7 @@ object Huffman {
       if (chars.isEmpty) result
       else {
         getCorrectPair(result, chars.head) match {
-          case (char, counter) => timesAcc(chars.tail, (chars.head, counter+1) :: result.filterNot(p => p._1 == chars.head))
+          case (char, counter) => timesAcc(chars.tail, (chars.head, counter + 1) :: result.filterNot(p => p._1 == chars.head))
           case _ => timesAcc(chars.tail, (chars.head, 1) :: result)
         }
       }
@@ -101,7 +101,35 @@ object Huffman {
     * head of the list should have the smallest weight), where the weight
     * of a leaf is the frequency of the character.
     */
-  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+  def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+
+    def getCorrectPair(result: List[(Char, Int)], prevRes: Option[(Char, Int)]): (Char, Int) = {
+      prevRes match {
+        case Some(x) => {
+          if (result.isEmpty) {
+            x
+          } else if (result.head._2 > x._2) {
+            getCorrectPair(result.tail, Some(result.head))
+          } else {
+            getCorrectPair(result.tail, prevRes)
+          }
+        }
+        case None => getCorrectPair(result.tail, Some(result.head))
+      }
+    }
+
+    def makeOrderedLeafListAcc(fAcc: List[(Char, Int)], rAcc: List[Leaf]): List[Leaf] = {
+      if (fAcc.isEmpty) {
+        rAcc
+      } else {
+        getCorrectPair(fAcc, None) match {
+          case x => makeOrderedLeafListAcc(fAcc.filterNot(p => p._1 == x._1), new Leaf(x._1, x._2) :: rAcc)
+        }
+      }
+    }
+
+    makeOrderedLeafListAcc(freqs, List.empty)
+  }
 
   /**
     * Checks whether the list `trees` contains only one single code tree.
