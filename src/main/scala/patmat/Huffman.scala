@@ -103,28 +103,18 @@ object Huffman {
     */
   def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
 
-    def getCorrectPair(result: List[(Char, Int)], prevRes: Option[(Char, Int)]): (Char, Int) = {
-      prevRes match {
-        case Some(x) => {
-          if (result.isEmpty) {
-            x
-          } else if (result.head._2 > x._2) {
-            getCorrectPair(result.tail, Some(result.head))
-          } else {
-            getCorrectPair(result.tail, prevRes)
-          }
-        }
-        case None => getCorrectPair(result.tail, Some(result.head))
-      }
+    def getCorrectPair(result: List[(Char, Int)], prevRes: Option[(Char, Int)]): (Char, Int) = prevRes match {
+      case Some(x) =>
+        if (result.isEmpty) x
+        else if (result.head._2 > x._2) getCorrectPair(result.tail, Some(result.head))
+        else getCorrectPair(result.tail, prevRes)
+      case None => getCorrectPair(result.tail, Some(result.head))
     }
 
     def makeOrderedLeafListAcc(fAcc: List[(Char, Int)], rAcc: List[Leaf]): List[Leaf] = {
-      if (fAcc.isEmpty) {
-        rAcc
-      } else {
-        getCorrectPair(fAcc, None) match {
-          case x => makeOrderedLeafListAcc(fAcc.filterNot(p => p._1 == x._1), new Leaf(x._1, x._2) :: rAcc)
-        }
+      if (fAcc.isEmpty) rAcc
+      else getCorrectPair(fAcc, None) match {
+        case x => makeOrderedLeafListAcc(fAcc.filterNot(p => p._1 == x._1), new Leaf(x._1, x._2) :: rAcc)
       }
     }
 
@@ -134,7 +124,7 @@ object Huffman {
   /**
     * Checks whether the list `trees` contains only one single code tree.
     */
-  def singleton(trees: List[CodeTree]): Boolean = ???
+  def singleton(trees: List[CodeTree]): Boolean = trees.length == 1
 
   /**
     * The parameter `trees` of this function is a list of code trees ordered
